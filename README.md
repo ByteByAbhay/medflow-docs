@@ -1102,6 +1102,80 @@ graph LR
 
 ---
 
+# END-TO-END SYSTEM FLOW
+
+> This diagram shows the **complete unified flow** of the MedFlow system from patient arrival to exit, including OPD consultation, consultant referral, lab processing, and billing.
+
+```mermaid
+flowchart TD
+
+    A[Patient Arrives]
+    B[Reception Desk]
+    C[Patient Registered or Found]
+    D[Visit Created - Waiting]
+    E[OPD Doctor Queue]
+    F[OPD Clinical Assessment]
+
+    G[History and Symptoms]
+    H[Examination and Vitals]
+    I[Diagnosis]
+    J[Prescription]
+    K[Lab Orders]
+    L[Follow Up Plan]
+
+    M{Case Complex?}
+
+    N[Complete OPD Visit]
+    O[Billing and Payment]
+    P[Patient Exit]
+
+    Q[Refer to Consultant]
+    R[Consultant Queue]
+    S[Consultant Review]
+    T[Modify Diagnosis or Treatment]
+    U[Decide Surgery or Admission]
+    V[Finalize Consultation]
+    W[Billing or Admission]
+
+    X[Lab Processing]
+    Y[Lab Reports Uploaded]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+
+    F --> G
+    F --> H
+    F --> I
+    F --> J
+    F --> K
+    F --> L
+
+    F --> M
+
+    M -->|No| N
+    N --> O
+    O --> P
+
+    M -->|Yes| Q
+    Q --> R
+    R --> S
+    S --> T
+    S --> U
+    S --> V
+    V --> W
+    W --> P
+
+    K --> X
+    X --> Y
+    Y --> F
+    Y --> S
+```
+
+---
+
 # COMPLETE PATIENT JOURNEY DIAGRAM
 
 ```mermaid
