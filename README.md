@@ -1109,69 +1109,168 @@ graph LR
 ```mermaid
 flowchart TD
 
-    A[Patient Arrives]
-    B[Reception Desk]
-    C[Patient Registered or Found]
-    D[Visit Created - Waiting]
-    E[OPD Doctor Queue]
-    F[OPD Clinical Assessment]
+    %% =========================
+    %% PATIENT ENTRY
+    %% =========================
+    A[Patient Comes to Hospital]
 
-    G[History and Symptoms]
-    H[Examination and Vitals]
-    I[Diagnosis]
-    J[Prescription]
-    K[Lab Orders]
-    L[Follow Up Plan]
+    A --> B{Visit Type}
 
-    M{Case Complex?}
+    %% =========================
+    %% WALK-IN FLOW
+    %% =========================
+    B -->|Walk-in| C[Reception Registration]
+    C --> D[Patient Record Ready]
+    D --> E[Visit Created - WAITING]
 
-    N[Complete OPD Visit]
-    O[Billing and Payment]
-    P[Patient Exit]
+    %% =========================
+    %% APPOINTMENT FLOW
+    %% =========================
+    B -->|Appointment| F[Verify Appointment]
 
-    Q[Refer to Consultant]
-    R[Consultant Queue]
-    S[Consultant Review]
-    T[Modify Diagnosis or Treatment]
-    U[Decide Surgery or Admission]
-    V[Finalize Consultation]
-    W[Billing or Admission]
+    F --> G{Patient Arrival Time}
 
-    X[Lab Processing]
-    Y[Lab Reports Uploaded]
+    G -->|On Time| H[Check-in Patient]
+    G -->|Late| I[Late Arrival Check]
+    G -->|Not Arrived| J[Wait Until Grace Time]
 
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
+    %% On-time appointment
+    H --> K[Appointment Status = CHECKED_IN]
+    K --> L[Visit Created - APPOINTMENT]
+    L --> M[Priority Queue]
 
-    F --> G
-    F --> H
-    F --> I
-    F --> J
-    F --> K
-    F --> L
+    %% Late arrival handling
+    I --> N{Within Grace Time?}
+    N -->|Yes| H
+    N -->|No| O[Appointment Marked NO_SHOW]
+    O --> P[Convert to Walk-in]
+    P --> E
 
-    F --> M
+    %% No-show handling
+    J --> Q{Grace Time Over?}
+    Q -->|Yes| O
+    Q -->|No| J
 
-    M -->|No| N
-    N --> O
-    O --> P
+    %% =========================
+    %% EMERGENCY FLOW
+    %% =========================
+    B -->|Emergency| R[Emergency Triage]
+    R --> S[Immediate Vitals & Stabilization]
+    S --> T[Emergency Visit Created]
+    T --> U[Emergency Priority Queue]
 
-    M -->|Yes| Q
-    Q --> R
-    R --> S
-    S --> T
-    S --> U
-    S --> V
-    V --> W
-    W --> P
+    %% =========================
+    %% COMMON OPD QUEUE
+    %% =========================
+    E --> V[OPD Doctor Queue]
+    M --> V
+    U --> V
 
-    K --> X
-    X --> Y
-    Y --> F
-    Y --> S
+    %% =========================
+    %% OPD DOCTOR ASSESSMENT
+    %% =========================
+    V --> W[OPD Doctor Assessment]
+
+    W1[History & Symptoms]
+    W2[Vitals & Examination]
+    W3[Clinical Impression]
+    W4[Diagnosis]
+    W5[Medicines Prescribed]
+    W6[Lab Tests Ordered]
+    W7[Follow-up Advice]
+
+    W --> W1
+    W --> W2
+    W --> W3
+    W --> W4
+    W --> W5
+    W --> W6
+    W --> W7
+
+    %% =========================
+    %% OPD DECISION
+    %% =========================
+    X{Case Type Decision}
+
+    W --> X
+
+    %% =========================
+    %% ROUTINE CASE
+    %% =========================
+    Y[Routine OPD Case]
+    Z[Visit Completed]
+    AA[Billing & Payment]
+    AB[Patient Goes Home]
+
+    X -->|Routine| Y
+    Y --> Z
+    Z --> AA
+    AA --> AB
+
+    %% =========================
+    %% COMPLEX / HIGH-RISK CASE
+    %% =========================
+    AC[Complex / High Risk Case]
+    AD[Refer to Consultant]
+    AE[Consultant Queue]
+    AF[Consultant Review]
+
+    X -->|Complex| AC
+    AC --> AD
+    AD --> AE
+    AE --> AF
+
+    AF1[Review OPD Notes]
+    AF2[Confirm or Change Diagnosis]
+    AF3[Modify Treatment Plan]
+
+    AF --> AF1
+    AF --> AF2
+    AF --> AF3
+
+    %% =========================
+    %% CONSULTANT DECISION
+    %% =========================
+    AG{Consultant Decision}
+
+    AF --> AG
+
+    AH[Continue Medical Treatment]
+    AI[Plan Surgery]
+    AJ[Plan Admission]
+    AK[Refer Sub-specialist]
+
+    AG -->|Medical| AH
+    AG -->|Surgery| AI
+    AG -->|Admission| AJ
+    AG -->|Specialist| AK
+
+    %% =========================
+    %% FINALIZATION
+    %% =========================
+    AL[Final Approval]
+    AM[Final Billing / Admission]
+    AN[Patient Discharge or Admit]
+
+    AH --> AL
+    AI --> AL
+    AJ --> AL
+    AK --> AL
+
+    AL --> AM
+    AM --> AN
+
+    %% =========================
+    %% LAB FLOW
+    %% =========================
+    AO[Lab Processing]
+    AP[Lab Reports Uploaded]
+
+    W6 --> AO
+    AO --> AP
+    AP --> W
+    AP --> AF
+
 ```
 
 ---
